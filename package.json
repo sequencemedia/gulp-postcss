@@ -47,5 +47,15 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.1.1",
     "husky": "^8.0.3"
+  },
+  "files": [
+    "LICENSE",
+    "index.mjs"
+  ],
+  "imports": {
+    "#gulp-postcss": "./index.mjs"
+  },
+  "exports": {
+    ".": "./index.mjs"
   }
 }
