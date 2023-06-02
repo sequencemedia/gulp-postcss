@@ -1,7 +1,13 @@
-node_modules
-npm-debug.log
 .DS_Store
-.nyc_output/
-coverage/
-package-lock.json
-yarn.lock
+
+**/node_modules/*
+**/npm-debug.log
+
+# User-defined NPM configuration
+.npmrc
+
+# User-defined NVM configuration
+.nvmrc
+
+# Deps
+.depsrc
