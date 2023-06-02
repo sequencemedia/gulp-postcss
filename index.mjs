@@ -1,5 +1,7 @@
 import path from 'node:path'
-import { Transform } from 'node:stream'
+import {
+  Transform
+} from 'node:stream'
 import postcss from 'postcss'
 import postcssLoadConfig from 'postcss-load-config'
 import vinylSourceMaps from 'vinyl-sourcemaps-apply'
@@ -85,6 +87,7 @@ export default withConfigLoader((loadConfig) => {
             )
           }
         }
+
         return postcss(config.plugins || [])
           .process(file.contents, options)
       })
