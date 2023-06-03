@@ -8,16 +8,51 @@ import vinylSourceMaps from 'vinyl-sourcemaps-apply'
 import fancyLog from 'fancy-log'
 import PluginError from 'plugin-error'
 
-export default withConfigLoader((loadConfig) => {
-  const streamTransform = new Transform({ objectMode: true })
+const PLUGIN_NAME = '@sequencemedia/gulp-postcss'
 
-  streamTransform._transform = (file, encoding, done) => {
+function useLoadConfig (loadConfig) {
+  return function loadConfigFor (plugins = {}, options) {
+    if (Array.isArray(plugins)) {
+      return loadConfig(() => Promise.resolve({ plugins, options }))
+    }
+
+    if (plugins instanceof Function) {
+      return loadConfig((file) => Promise.resolve(plugins(file)))
+    }
+
+    return loadConfig((file) => {
+      let configPath = file.dirname
+
+      if (plugins.config) {
+        if (path.isAbsolute(plugins.config)) {
+          configPath = plugins.config
+        } else {
+          configPath = path.join(file.base, plugins.config)
+        }
+      }
+
+      const config = {
+        file,
+        options: plugins
+      }
+
+      return (
+        postcssLoadConfig(config, configPath)
+      )
+    })
+  }
+}
+
+function getTransformFor (loadConfig) {
+  return async function transform (file, encoding, done) {
     if (file.isNull()) {
-      return done(null, file)
+      done(null, file)
+      return
     }
 
     if (file.isStream()) {
-      return handleError('Streams are not supported!')
+      handleError('Streams are not supported')
+      return
     }
 
     // Protect `from` and `map` if using gulp-sourcemaps
@@ -47,9 +82,14 @@ export default withConfigLoader((loadConfig) => {
       const warnings = result.warnings().join('\n')
 
       if (warnings) {
-        fancyLog.info('gulp-postcss:', file.relative + '\n' + warnings)
+        fancyLog.info(
+          `${PLUGIN_NAME}:`,
+          `${warnings} (${file.relative})`
+        )
       }
 
+      // Prevent stream's unhandled exception from
+      // being suppressed by Promise
       setImmediate(() => {
         done(null, file)
       })
@@ -66,66 +106,42 @@ export default withConfigLoader((loadConfig) => {
         error = error.message + '\n\n' + error.showSourceCode() + '\n'
       }
 
-      // Prevent stream’s unhandled exception from
+      // Prevent stream's unhandled exception from
       // being suppressed by Promise
       setImmediate(() => {
-        done(new PluginError('gulp-postcss', error, errorOptions))
+        done(new PluginError(PLUGIN_NAME, error, errorOptions))
       })
     }
 
-    loadConfig(file)
-      .then((config) => {
-        const opts = config.options || {}
-        // Extend the default options if not protected
-        for (const opt in opts) {
-          if (Object.prototype.hasOwnProperty.call(opts, opt) && !isProtected[opt]) {
-            options[opt] = opts[opt]
-          } else {
-            fancyLog.info(
-              'gulp-postcss:',
-              `${file.relative}\nCannot override ${opt} option because it is required by gulp-sourcemaps`
-            )
+    return await (
+      loadConfig(file)
+        .then((config) => {
+          const opts = config.options || {}
+          // Extend the default options if not protected
+          for (const opt in opts) {
+            if (Object.prototype.hasOwnProperty.call(opts, opt) && !isProtected[opt]) {
+              options[opt] = opts[opt]
+            } else {
+              fancyLog.info(
+                `${PLUGIN_NAME}:`,
+                `Cannot override "${opt}" because it is required by @sequencemedia/gulp-sourcemaps (${file.relative})`
+              )
+            }
           }
-        }
 
-        return postcss(config.plugins || [])
-          .process(file.contents, options)
-      })
-      .then(handleResult)
-      .catch(handleError)
-  }
-
-  return streamTransform
-})
-
-function withConfigLoader (done) {
-  return function (plugins = {}, options) {
-    if (Array.isArray(plugins)) {
-      return done(() => Promise.resolve({ plugins, options }))
-    }
-
-    if (plugins instanceof Function) {
-      return done((file) => Promise.resolve(plugins(file)))
-    }
-
-    return done((file) => {
-      let configPath = file.dirname
-
-      if (plugins.config) {
-        if (path.isAbsolute(plugins.config)) {
-          configPath = plugins.config
-        } else {
-          configPath = path.join(file.base, plugins.config)
-        }
-      }
-
-      return postcssLoadConfig(
-        {
-          file,
-          options: plugins
-        },
-        configPath
-      )
-    })
+          return (
+            postcss(config.plugins || [])
+              .process(file.contents, options)
+          )
+        })
+        .then(handleResult)
+        .catch(handleError)
+    )
   }
 }
+
+export default useLoadConfig((loadConfig) => {
+  const transform = getTransformFor(loadConfig)
+
+  return new Transform({ transform, objectMode: true })
+})
