@@ -37,7 +37,7 @@
   "dependencies": {
     "fancy-log": "^2.0.0",
     "plugin-error": "^2.0.1",
-    "postcss": "^8.4.31",
+    "postcss": "^8.4.32",
     "postcss-load-config": "^5.0.0",
     "vinyl-sourcemaps-apply": "^0.2.1"
   },
@@ -46,7 +46,7 @@
     "@babel/eslint-parser": "^7.23.3",
     "@babel/preset-env": "^7.23.5",
     "@sequencemedia/hooks": "^1.0.465",
-    "eslint": "^8.54.0",
+    "eslint": "^8.55.0",
     "eslint-config-standard": "^17.1.0",
     "husky": "^8.0.3"
   },
