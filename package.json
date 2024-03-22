@@ -1,6 +1,6 @@
 {
   "name": "@sequencemedia/gulp-postcss",
-  "version": "1.0.101",
+  "version": "1.0.102",
   "description": "PostCSS for Gulp",
   "keywords": [
     "gulp plugin",
