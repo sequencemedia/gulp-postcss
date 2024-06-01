@@ -38,14 +38,14 @@
     "fancy-log": "^2.0.0",
     "plugin-error": "^2.0.1",
     "postcss": "^8.4.38",
-    "postcss-load-config": "^5.1.0",
+    "postcss-load-config": "^6.0.0",
     "vinyl-sourcemaps-apply": "^0.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.24.6",
     "@babel/eslint-parser": "^7.24.6",
     "@babel/preset-env": "^7.24.6",
-    "@sequencemedia/hooks": "^1.0.493",
+    "@sequencemedia/hooks": "^1.0.494",
     "eslint": "8.57.0",
     "eslint-config-standard": "^17.1.0",
     "husky": "^9.0.11"
