@@ -37,7 +37,7 @@
   "dependencies": {
     "fancy-log": "^2.0.0",
     "plugin-error": "^2.0.1",
-    "postcss": "^8.5.0",
+    "postcss": "^8.5.1",
     "postcss-load-config": "^6.0.1",
     "vinyl-sourcemaps-apply": "^0.2.1"
   },
