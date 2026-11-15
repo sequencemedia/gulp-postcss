@@ -32,7 +32,7 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
-    "prepare": "husky"
+    "prepare": "node husky.mjs"
   },
   "dependencies": {
     "fancy-log": "^2.0.0",
